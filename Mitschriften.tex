@@ -1,0 +1,220 @@
+\documentclass{report}
+
+\input{preamble}
+\input{macros}
+\input{letterfonts}
+
+\title{\Huge{TI-2}\\Mitschriften}
+\author{\huge{Paul Glaser}}
+\date{\today}
+
+\begin{document}
+\nocite{*}
+
+\maketitle
+\newpage% or \cleardoublepage
+% \pdfbookmark[<level>]{<title>}{<dest>}
+\pdfbookmark[section]{\contentsname}{toc}
+\tableofcontents
+\chapter{Turing-Maschinen}
+\dfnc{Deterministische Turingmaschine}{
+Deterministische Turingmaschine: 7-Tupel $M=\left(Q, \Sigma, \Gamma, \delta, q_0, B, F\right)$
+\begin{itemize}
+	\item $Q$ nichtleere endliche Zustandsmenge
+	\item $\Sigma$ endliches Eingabealphabet
+	\item $\Gamma \supseteq \Sigma$ endliches Bandalphabet
+	\item $\delta: Q \times \Gamma \rightarrow Q \times \Gamma \times\{L, R\}$ (partielle) Überführungsfunktion
+	\item $B \in \Gamma \backslash \Sigma$ Leersymbol des Bands
+	\item $F \subseteq Q$ Menge von akzeptierenden (End-)Zuständen
+\end{itemize}
+NTM analog mit mengenwertigem $\delta: Q \times \Gamma \rightarrow \mathcal{P}_e(Q \times \Gamma \times\{L, R\})$
+}
+\subsection*{Konvention}
+Konvention: $\delta(q, X)$ undefiniert für Endzustände $q \in F$ - Turingmaschine hält an, wenn $\delta(q, X)$ undefiniert ist.
+\subsection*{Konfiguration}
+Konfiguration $\hat{=}$ Zustand + Bandinhalt + Kopfposition
+\newline
+\begin{itemize}
+	\item Formal dargestellt als Tripel $K=(u, q, v) \in \Gamma^* \times Q \times \Gamma^{+}$
+	$\cdot u, v$ : String links/rechts vom Kopf $q$ Zustand
+	\item Nur der bereits 'besuchte' Teil des Bandes wird betrachtet
+	Blanks am Anfang von $u$ oder am Ende von $v$ entfallen, wo möglich
+\end{itemize}
+\subsection*{Akzeptierende Sprachen}
+$$
+L(M)=\left\{w \in \Sigma^* \mid \exists p \in F . \exists u, v \in \Gamma^* .\left(\epsilon, q_0, w\right) \vdash^*(u, p, v)\right\}
+$$
+\section*{Zeit- und Platzbedarf}
+\subsection*{Rechenzeit $t_M(w)$}
+Anzahl der Konfigurationsuberg ¨ ange ¨ bis M bei Eingabe w anhalt
+\subsection*{Speicherbedarf $s_M(w)$}	
+Anzahl der Bandzellen, die M wahrend der Berechnung aufsucht
+\subsection*{Komplexität: Bedarf relatov zur Größe}
+$$
+\begin{aligned}
+& \boldsymbol{T}_M(\boldsymbol{n})=\max \left\{t_M(w)|| w \mid=n\right\} \\
+& \boldsymbol{S}_M(\boldsymbol{n})=\max \left\{s_M(w)|| w \mid=n\right\}
+\end{aligned}
+$$
+\dfnc{Die berechnete Funktion einer Turingmaschine}{
+\begin{itemize}
+	\item Anfangskonfiguration: $\alpha(w):=\left(\epsilon, q_0, w\right)$
+	\item Terminierung: $M \downarrow_K:=\exists u, v, q, X . K=(u, q, X v) \wedge \delta(q, X)$ undefiniert
+	\item Rechenzeit: $t_M(w):=\max \left\{j \mid \alpha(w) \vdash^j K \wedge M \downarrow_K\right\}$
+	\item Undefiniert falls dieses Maximum nicht existiert, d.h. wenn $M$ nicht auf $w$ hält
+	\item Ausgabefunktion: für $K=(u, q, v)$ ist $\omega(K):=\left.v\right|_{\Sigma}$ (längster Präfix von $v$, der zu $\Sigma^*$ gehört)
+	\item Ausgabe beginnt unter dem Kopf bis ein Symbol nicht aus $\Sigma$ erreicht wird
+	\item Berechnete Funktion: $f_M(w):=\left\{\omega(K) \mid \exists i \in \mathbb{N} . \alpha(w) \vdash^i K \wedge M \downarrow_K\right\}$
+	\item 	$f_M(w)$ ist undefiniert, wenn diese Menge leer ist, also wenn $t_M(w)$ undefiniert ist
+	Für DTMs ist $f_M(w)=\omega(K)$ für das eindeutig bestimmte $K$ mit $\alpha(w) \vdash^{t_M(w)} K$
+\end{itemize}}
+\chapter{Rekursive Funktionen}
+\section{Primitiv-rekursive Funktionen}
+\dfn{Berechenbare Grundfunktionen}{
+	\begin{itemize}
+		\item Nachfolgerfunktion: von einer Zahl zur nachsten weiterzählen \quad\color{red}$s$\color{black}
+		\item Projektion: aus einer Gruppe von Werten einen herauswahlen \quad\color{red}$pr_k^n$\color{black}
+		\item Konstante: unabhangig von der Eingabe eine feste Zahl ausgeben \quad\color{red}$c_k^n$\color{black}
+	\end{itemize}
+	In der primitven Rekursion gibt es diese 3 Grundfunktionen und 2 möglichkeiten diese miteinander zu verbinden um neue Funktionen zu definieren.
+	\begin{itemize}
+		\item Komposition: Verkettung von Funktionen
+		\item Rekursion: Programm ruft sich bei Ausfuhrung selbst auf
+	\end{itemize}
+}
+\nt{Mit diesen wenigen Bausteinen lassen sich bereits fast alle Funktionen berechnen.}
+\dfn{Mathematische Definition der Grundfunktionen}{
+	Grundfunktionen:
+	\begin{itemize}
+		\item Nachfolgerfunktion $s: \mathbb{N} \rightarrow \mathbb{N} \quad$ mit $s(x)=x+1$
+		\item Projektionsfunktionen $p r_k^n: \mathbb{N}^n \rightarrow \mathbb{N}\quad \color{red}(1 \leq k \leq n)\color{black} \quad$ mit $p r_k^n\left(x_1, . ., x_n\right)=x_k$
+		\item Konstantenfunktion $c_k^n: \mathbb{N}^n \rightarrow \mathbb{N}\quad \color{red}(0 \leq n)\color{black} \quad$ mit $c_k^n\left(x_1, \ldots, x_n\right)=k$
+	\end{itemize}
+	Operationen auf Funktionen
+	\begin{itemize}
+		\item Komposition $f \circ\left(g_1, \ldots, g_n\right): \mathbb{N}^k \rightarrow \mathbb{N} $  \quad mit $\left(g_1, . ., g_n: \mathbb{N}^k \rightarrow \mathbb{N}, f: \mathbb{N}^n \rightarrow \mathbb{N}\right)$\newline
+		Für $h=f \circ\left(g_1, . ., g_n\right)$ gilt $h(\vec{x})=f\left(g_1(\vec{x}), \ldots, g_n(\vec{x})\right)$
+		\item Primitive Rekursion $\operatorname{Pr}[\boldsymbol{f}, \boldsymbol{g}]: \mathbb{N}^k \rightarrow \mathbb{N}$ \quad mit $\left(f: \mathbb{N}^{k-1} \rightarrow \mathbb{N}, g: \mathbb{N}^{k+1} \rightarrow \mathbb{N}\right)$\newline
+		Für $h=\operatorname{Pr}[f, g]$ gilt $h(\vec{x}, 0)=f(\vec{x})$\newline
+		und $h(\vec{x}, y+1)=g(\vec{x}, y, h(\vec{x}, y))$
+	\end{itemize}
+}
+	\ex{}{Sei $f(x)=x+3$, kann über Komposition realisiert werden:
+	$$
+	f=s\circ s\circ s\circ pr_1^1
+	$$
+	Sei $h(x,y)=x+y$, dann gilt 
+	$$
+	h(x,0) = x\text{ nach Definition der primitven Rekursion }h(x,0)=f(x)=x
+	$$
+	$$
+	h(x,y+1) = g(x,y,h(x,y)) = 1 + h(x,y)
+	$$
+	$y$ wird rekusiv um 1 reduziert, dafür wird jedes mal 1 auf-addiert. Jetzt müssend die Funktionen $f$ und $g$ noch als Primitiv Rekursive Funktionen aufgeschrieben werden.
+	$$
+	f=pr_1^1
+	$$
+	$$
+	g=s\circ pr_3^3 \text{ da die Funktion $g$ 3 Eingabewerte hat}
+	$$
+	Die Funktion $h$ ist dann 
+	$$
+	h=\operatorname{Pr}[f,g]
+	$$
+	}
+
+	\chapter{Elementare Berechenbarkeitstheorie}
+	\section{Elementare Berechenbarkeitstheorie}
+	Es gibt viele Fragen zur Berechenbarkeit:
+		\begin{itemize}
+			\item Welche Funktionen sind berechenbar und welche nicht?
+			\item Welche Probleme sind (semi-)entscheidbar und welche nicht?
+			\item Abschlusseigenschaften: wie kann man Lösungen wiederverwenden?
+			\item Grenzen des Machbaren: was ist nicht mehr berechenbar?
+		\end{itemize}
+	Wie kann man nachweisen, dass ein Problem nicht lösbar ist?
+	\clm{Antworten hängen nicht vom Berechnungsmodell ab}{}{Nach der Church-Turing-These}
+		\begin{itemize}
+			\item Berechenbarkeit, (semi-)Entscheidbarkeit, (Zeit-/Platz)Komplexität sind allgemeine Konzepte
+			\item Löse Theorie von Betrachtung konkreter Modelle
+			\item Formuliere Grundeigenschaften (Axiome) berechenbarer Funktionen
+			\item Beweise diese Eigenschaften mit einem Modell (Turingmaschine)
+			\item Stütze alle Beweise für Aussagen nur noch auf diese Eigenschaften denn sie gelten für alle gleichmächtigen Berechnungsmodelle
+		\end{itemize}
+	
+	\section{Formuliere Theorie Berechenbarer Funktionen}
+	\clm{Es reicht berechenbare Funktionen zu betrachten}{}{(Semi-)Entscheidbarkeit einer Menge ist äquivalent zur Berechenbarkeit ihrer (partiell-)charakteristischen Funktion}
+	\clm{Es reicht Berechenbarkeit auf Zahlen zu betrachten}{}{\begin{itemize}
+		\item Berechenbarkeitskonzepte auf Wörtern und Zahlen sind gleichwertig, da Zahlen als Wörter codierbar sind (binär oder anders) und andersrum
+		\item Es ist meist leichter, mit Zahlen zu arbeiten (z.B. Rechenzeit)
+		\item Programme und Daten sind als Zahlen codierbar
+	\end{itemize}}
+	\clm{Es reicht einstellige Funktionen auf $\mathbb{N} \rightarrow \mathbb{N}$ zu betrachten}{}{Funktionen auf Zahlenpaaren und -listen sind einstellig simulierbar}
+	\section{Berechenbare Funktionen sind aufzählbar}
+	\clm{Turingmaschinen sind als Wörter codierbar}{}{Es reicht, Turingmaschinen mit $\Gamma=\{0,1, B\}$ und $F=\left\{q_1\right\}$ zu betrachten, sie können immer noch alles berechnen was uneingeschränlte TMs berechnen können.\newline
+	\nt{\textbf{Das tatsächliche Codieren:}\newline
+	\begin{itemize}
+		\item Definiere $\operatorname{code}(\delta(q, X)) \equiv q X p Y D$, falls $\delta(q, X)=(p, Y, D) \quad(\epsilon$ sonst $)$
+		\item Codiere die Maschine $M=\left(Q, \Sigma, \Gamma, \delta, q_0, B, F\right)$ durch das Wort $\operatorname{code}\left(\delta\left(q_0, 0\right)\right) \operatorname{code}\left(\delta\left(q_0, 1\right)\right) \operatorname{code}\left(\delta\left(q_0, B\right)\right) \ldots \operatorname{code}\left(\delta\left(q_n, B\right)\right)$
+		\item Codiere Alphabet $\left\{q_0, \ldots, q_n, 0,1, B, L, R\right\}$ als Wörter über $\Delta=\{0,1\}$
+	\end{itemize}
+	}
+	}
+	\clm{Wörter über einem Alphabet sind numerierbar}{}{
+		Bestimme lexikographische Ordnung der Wörter über $\Delta=\left\{x_1, \ldots, x_n\right\}$
+$$
+\epsilon<x_1<\ldots<x_n<x_1 x_1<x_1 x_2<\ldots<x_n x_n<x_1 x_1 x_1<\ldots
+$$
+- Zähle entsprechend durch: $w_0:=\epsilon, w_1:=x_1, . . w_n:=x_n, w_{n+1}:=x_1 x_1, \ldots$
+	}
+	\clm{Turingmaschinen sind (bijektiv) numerierbar}{}{
+		Aus Claim 3.3.1 und Claim 3.3.2 lässt sich ableiten das Turingmaschinen numerierbar sind. \newline
+		Zähle Wörter über $\Delta$ auf und teste, ob sie Turingmaschinen codieren:\newline
+		$M_i$ ist die Turingmaschine, deren Codierung an $i$-ter Stelle erscheint.\newline
+		Die Nummer $i$ wird auch die Gödelnummer von $M_i$ genannt
+	}
+	\section{Kernaxiome}
+	\dfn{}{$\varphi_i$ ist die von $M_i$ berechnete (partielle) Funktion auf $\mathbb{N}$\newline
+
+	$\Phi_i$ ist die zugehörige Schrittzahlfunktion von $M_i$}
+	\clm{$
+	\varphi: \mathbb{N} \rightarrow \mathcal{R} \text { is surjektiv, aber nicht bijektiv }
+	$}{}{Jede programmierbare Funktion hat einen Index, aber jede berechenbare Funktion hat unendlich viele Programme die sie realisieren.}
+	\ex{}{Bspw. Existieren unendlich viele Turingmaschinen die die Addition zweier Zahlen berechnen.\newline
+	Sei $M_i$ eine Turingmaschine welche die Addition berechnet, so können dieser unendlich viele Zustände hinzugefügt werden, welche nichts an der berechnenden Funktion ändern. Somit gibt es unendlich viele Programme welche die Addition zweier Zahlen berechnen.
+	}
+\dfn{Axiom 1}{$$
+\text { Für alle } i \text { gilt domain }\left(\Phi_i\right)=\operatorname{domain}\left(\varphi_i\right)
+$$
+Per Konstruktion kann $\Phi_i$ nur definiert sein, wenn $\varphi_i$ hält, wenn $\varphi_i$ ist es definiert.}
+\dfn{Axiom 2}{$$
+\left\{\langle i, n, t\rangle \mid \Phi_i(n)=t\right\} \text { ist entscheidbar }
+$$
+$\text { Simuliere Ausführung von } \varphi_i(n) \text { für maximal } t \text { Schritte }$}
+\dfn{Axiom 3}{$$
+u: \mathbb{N} \rightarrow \mathbb{N} \text { mit } u\langle i, n\rangle=\varphi_i(n) \text { ist berechenbar (UTM Theorem) }
+$$}
+- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
